@@ -1,0 +1,465 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      xml:lang="en" lang="en"
+      metal:use-macro="here/prefs_main_template/macros/master"
+      i18n:domain="plone.app.ldap">
+
+<metal:block metal:fill-slot="top_slot"
+             tal:define="dummy python:request.set('disable_border',1)" />
+
+<body>
+
+<metal:main fill-slot="prefs_configlet_main">
+
+    <metal:form metal:define-macro="form">
+
+    <metal:block define-macro="header">
+
+        <dl tal:define="status view/status"
+             tal:condition="status"
+             class="portalMessage info">
+            <dt i18n:translate="">
+                Info
+            </dt>
+            <dd tal:content="view/status" />
+        </dl>
+
+    </metal:block>
+
+    <h1 class="documentFirstHeading"
+        i18n:translate="title_manage_ldap"
+        metal:define-slot="heading">
+        LDAP configuration
+    </h1>
+
+    <div class="documentDescription" i18n:translate="description-ldap-controlpanel">
+        In this control panel you can configure an LDAP connection. You can either use a standard LDAP server or a Microsoft Active Directory Server.
+    </div>
+
+    <div id="content-core">
+        <a href=""
+           class="link-parent"
+           tal:attributes="href string:$portal_url/plone_control_panel"
+           i18n:translate="label_up_to_plone_setup">
+            Up to Site Setup
+        </a>
+
+        <div class="form-status"
+           tal:define="status view/status"
+           tal:condition="status">
+
+          <div class="summary"
+               i18n:translate=""
+               tal:content="view/status">
+            Form status summary
+          </div>
+
+          <ul class="errors" tal:condition="view/errors">
+             <li tal:repeat="error view/error_views">
+                <span tal:replace="structure error">Error Type</span>
+             </li>
+          </ul>
+        </div>
+
+        <dl class="enableFormTabbing">
+            <dt id="fieldsetlegend-global" i18n:translate="legend-ldap-globalsettings">
+              Global Settings
+            </dt>
+            <dd id="fieldset-global">
+            
+                <p i18n:translate="description-ldap-globalsettings">
+                     The following settings affect rules globally.
+                 </p>
+                <form name="ldapSettings" method="POST"
+                      tal:attributes="action string:${context/absolute_url}/@@ldap-controlpanel">
+                    <input type="hidden" name="fieldset_id" value="fieldsetlegend-global" />
+                    <tal:block tal:repeat="widget view/widgets">
+                      <div class="field"
+                           tal:define="description widget/hint;
+                                       error widget/error"
+                           tal:attributes="class python:'field'+(error and ' error' or '')">
+            
+                        <label i18n:translate=""
+                               tal:attributes="for widget/name"
+                               tal:content="widget/label">
+                          label
+                        </label>
+            
+                        <span class="fieldRequired"
+                              title="Required"
+                              i18n:domain="plone"
+                              i18n:attributes="title title_required;"
+                              i18n:translate="label_required"
+                              tal:condition="widget/required">
+                          (Required)
+                        </span>
+            
+                        <div class="formHelp"
+                             tal:content="description"
+                             tal:condition="description">
+                          field description
+                        </div>
+            
+                        <div tal:condition="error"
+                             tal:content="structure error">
+                          The Error
+                        </div>
+            
+                        <div class="widget" tal:content="structure widget">
+                          <input type="text" />
+                        </div>
+                      </div>
+                    </tal:block>
+            
+                    <div class="formControls">
+                        <input type="submit" 
+                               name="form.actions.apply" 
+                               class="context"
+                               value="Save"
+                               i18n:domain="plone"
+                               i18n:attributes="value label_save;" />
+                    </div>
+                </form>
+            </dd>
+            
+            <dt id="fieldsetlegend-schema" i18n:translate="legend-schema">
+                 LDAP Schema
+            </dt>
+            <dd id="fieldset-schema">
+
+             <p i18n:translate="description-schema">
+             The LDAP schema defines the LDAP properties which can be used
+             by the Plone. Properties with a Plone property name will be
+             available as standard user properties in Plone. Properties without
+             a Plone property name can be used as user id, login name or
+             relative DN by the LDAP configuration.
+             </p>
+
+             <p i18n:translate="description-schema-protected">
+             As a safety precaution attributes that are used as login, user or rDN
+             attribute can not be removed.
+             </p>
+
+             <form style="display: inline" method="POST"
+                 id="ldap_schema_form"
+                 metal:define-macro="ldap_schema_form"
+                 tal:define="schema view/schema"
+                 tal:attributes="action string:${context/absolute_url}/@@ldap-controlpanel">
+             
+                 <input type="hidden" name="fieldset_id" value="fieldsetlegend-schema" />
+             
+                 <table class="listing nosort controlpanel-listing"
+                        tal:condition="schema">
+                     <thead>
+                         <tr>
+                             <th class="smallColumn">&#160;</th>
+                             <th class="smallColumn" i18n:translate="label_ldap_ldap_property">
+                                 LDAP property
+                             </th>
+                             <th class="smallColumn" i18n:translate="label_ldap_plone_property">
+                                 Plone property
+                             </th>
+                             <th class="smallColumn" i18n:translate="label_ldap_multi_valued">
+                                 Multi-valued
+                             </th>
+                             <th class="smallColumn" i18n:translate="label_ldap_binary">
+                                 Binary
+                             </th>
+                             <th class="smallColumn" i18n:translate="label_ldap_description">
+                                 Description
+                             </th>
+                         </tr>
+                     </thead>
+                     <tbody>
+                         <tal:repeat repeat="property schema">
+                         <tr tal:define="oddrow repeat/property/odd"
+                             tal:attributes="class python:oddrow and 'even' or 'odd'">
+                             <td>
+                                 <input type="checkbox" name="propertyId:list"
+                                        tal:condition="not:property/protected"
+                                        tal:attributes="value property/id" />
+                             </td>
+                             <td>
+                               <a href=""
+                                 tal:content="property/ldap_name"
+                                  tal:attributes="href string:${portal_url}/++ldapschema++${property/id}/edit">
+                                  cn
+                                </a>
+                             </td>
+                             <td tal:content="property/plone_name">
+                                 fullname
+                             </td>
+                             <td>
+                                 <span i18n:translate="label_yes" tal:condition="property/multi_valued">Yes</span>
+                                 <span i18n:translate="label_no" tal:condition="not:property/multi_valued">No</span>
+                             </td>
+                             <td>
+                                 <span i18n:translate="label_yes" tal:condition="property/binary">Yes</span>
+                                 <span i18n:translate="label_no" tal:condition="not:property/binary">No</span>
+                             </td>
+                             <td tal:content="property/description">
+                                 Full name
+                             </td>
+                         </tr>
+                     </tal:repeat>
+                     </tbody>
+                 </table>
+                 <tal:buttons condition="schema">
+                     <input class="context destructive" type="submit" value="Delete"
+                             name="form.actions.DeleteProperty"
+                             i18n:attributes="value label_delete_property;" />
+                 </tal:buttons>
+             </form>
+             <form class="inlineDisplay" method="POST"
+                 tal:attributes="action string:${context/absolute_url}/+ldapschema/plone.LdapProperty">
+                 <input class="context" type="submit" value="Add property"
+                         name="form.button.Add"
+                         i18n:attributes="value label_property_add;" />
+             </form>
+             
+          </dd>
+          
+         <dt id="fieldsetlegend-servers" i18n:translate="legend-servers">
+             LDAP Servers
+         </dt>
+          
+          <dd id="fieldset-servers">
+          
+             <p i18n:translate="description-servers">
+                 Overview of all configured LDAP servers. If multiple servers
+                 are used the will be tried in top-to-bottom order.
+
+             </p>
+
+             <form style="display: inline" method="POST"
+                 id="ldap_servers_form"
+                 metal:define-macro="ldap_servers_form"
+                 tal:define="servers view/servers"
+                 tal:attributes="action string:${context/absolute_url}/@@ldap-controlpanel">
+
+                 <input type="hidden" name="fieldset_id" value="fieldsetlegend-servers" />
+
+                 <table class="listing nosort controlpanel-listing"
+                        tal:condition="servers">
+                     <thead>
+                         <tr>
+                             <th class="smallColumn">&#160;</th>
+                             <th class="smallColumn" i18n:translate="label_ldap_enabled">
+                                 Active
+                             </th>
+                             <th class="smallColumn" i18n:translate="label_ldap_server">
+                                 Server
+                             </th>
+                             <th class="smallColumn" i18n:translate="label_ldap_connection_type">
+                                 Connection type
+                             </th>
+                             <th class="smallColumn" i18n:translate="label_ldap_connection_timeout">
+                                 Connection timeout
+                             </th>
+                             <th class="smallColumn" i18n:translate="label_ldap_operation_timeout">
+                                 Operation timeout
+                             </th>
+                         </tr>
+                     </thead>
+                     <tbody>
+                         <tal:repeat repeat="server servers">
+                         <tr tal:define="oddrow repeat/server/odd"
+                             tal:attributes="class python:oddrow and 'even' or 'odd'">
+                             <td>
+                                 <input type="checkbox" name="serverId:list"
+                                 tal:attributes="value server/id" />
+                             </td>
+                             <td class="checker">
+                               <img tal:replace="structure context/confirm_icon.gif"
+                                    tal:condition="server/enabled" />
+                             </td>
+                             <td>
+                               <a href=""
+                                  tal:content="server/server"
+                                  tal:attributes="href string:${portal_url}/++ldapserver++${server/id}/edit">
+                                 localhost
+                               </a>
+                             </td>
+                             <td tal:content="server/connection_type">
+                                 LDAP
+                             </td>
+                             <td>
+                                 <span tal:condition="python:server['connection_timeout']==-1"
+                                     tal:omit-tag=""
+                                     i18n:translate="label_infinity">
+                                     infinite
+                                 </span>
+                                 <span tal:condition="python:server['connection_timeout']!=-1"
+                                     tal:omit-tag=""
+                                     tal:content="server/connection_timeout">
+                                     5
+                                 </span>
+                             </td>
+                             <td>
+                                 <span tal:condition="python:server['operation_timeout']==-1"
+                                     tal:omit-tag=""
+                                     i18n:translate="label_infinity">
+                                     infinite
+                                 </span>
+                                 <span tal:condition="python:server['operation_timeout']!=-1"
+                                     tal:omit-tag=""
+                                     tal:content="server/operation_timeout">
+                                     5
+                                 </span>
+                             </td>
+                         </tr>
+                     </tal:repeat>
+                     </tbody>
+                 </table>
+                 <tal:buttons condition="servers">
+                     <input class="context" type="submit" value="Enable"
+                             name="form.actions.EnableServer"
+                             i18n:attributes="value label_enable;" />
+                     <input class="context" type="submit" value="Disable"
+                             name="form.actions.DisableServer"
+                             i18n:attributes="value label_disable;" />
+                     <input class="context destructive" type="submit" value="Delete"
+                             name="form.actions.DeleteServer"
+                             i18n:attributes="value label_delete;" />
+                 </tal:buttons>
+             </form>
+             <form class="inlineDisplay" method="POST"
+                 tal:attributes="action string:${context/absolute_url}/+ldapserver/plone.LdapServer">
+                 <input class="context" type="submit" value="Add LDAP server"
+                         name="form.button.Add"
+                         i18n:attributes="value label_server_add;" />
+             </form>
+          </dd>
+          
+          <dt id="fieldsetlegend-caches" i18n:translate="legend-caches">
+              Caches
+          </dt>
+          
+          <dd id="fieldset-caches">
+
+              <p i18n:translate="description-caches">
+                  Clear the caches, and adjust the cache timeouts.
+              </p>
+              
+              <form style="display: inline" method="POST"
+                  id="ldap_caches_form"
+                  metal:define-macro="ldap_caches_form"
+                  tal:attributes="action string:${context/absolute_url}/@@ldap-controlpanel">
+
+                  <input type="hidden" name="fieldset_id" value="fieldsetlegend-caches" />
+                  
+                  <h2 i18n:translate="heading-purge-all-caches">Purge All Caches</h2>
+                  
+                  <div class="field">
+                      <label i18n:translate="label_purge">Purge</label>
+                      <div class="formHelp" i18n:translate="help-purge-cache">
+                          Empty all caches and force reloading of user
+                          records from LDAP.
+                      </div>
+
+                    <div class="widget">
+                      <input type="submit" class="context"
+                        value="Purge" name="form.actions.Purge"
+                        i18n:attributes="value label_purge;"/>
+                    </div>
+                  
+                  </div>
+                  
+                  <h2 i18n:translate="heading-cache-timeouts">Cache Timeouts</h2>
+                  <div class="field">
+                      <label i18n:translate="label_auth_cache">Authenticated Cache</label>
+                      <div class="formHelp" i18n:translate="help-seconds">
+                          An integer representing seconds.
+                      </div>
+
+                    <div class="widget">
+                      <input type="text"
+                        name="form.auth_cache_seconds"
+                        tal:attributes="value view/auth_cache_seconds"/>
+                    </div>
+                  
+                  </div>
+
+                  <div class="field">
+                      <label i18n:translate="label_anon_cache">Anonymous Cache</label>
+                      <div class="formHelp" i18n:translate="help-seconds">
+                          An integer representing seconds.
+                      </div>
+
+                    <div class="widget">
+                      <input type="text"
+                        name="form.anon_cache_seconds"
+                        tal:attributes="value view/anon_cache_seconds"/>
+                    </div>
+                  
+                  </div>
+                  
+                  <div class="field">
+                      <label i18n:translate="label_negative_cache">Negative Cache</label>
+                      <div class="formHelp" i18n:translate="help-seconds">
+                          An integer representing seconds.
+                      </div>
+
+                    <div class="widget">
+                      <input type="text"
+                        name="form.negative_cache_seconds"
+                        tal:attributes="value view/negative_cache_seconds"/>
+                    </div>
+                  
+                  </div>  
+                  
+                  <input type="submit" class="context"
+                    value="Update Cache Timeouts" name="form.actions.UpdateCacheTimeouts"
+                    i18n:attributes="value label_update_cache_timeouts;"/>
+            
+                 <h2 i18n:translate="heading-cached-users">Cached Users</h2>
+                 
+                 <p tal:condition="python: not view.anon_cache() or view.auth_cache()">
+                 No users in cache
+                 (superuser is never cached)
+                 </p>
+                 
+                 <table class="listing controlpanel-listing" tal:condition="python: view.auth_cache() or view.anon_cache()">
+                   <thead>
+                   <tr>
+                     <th>Login Name</th>
+                     <th>User ID</th>
+                     <th>Roles</th>
+                     <th>Creation time</th>
+                     <th>Cache Type</th>
+                   </tr>
+                   </thead>
+                   
+                   <tbody>
+                   <tal:users tal:repeat="user python: view.auth_cache() + view.anon_cache()">
+                   <tr tal:define="oddrow repeat/user/odd"
+                       tal:attributes="class python:oddrow and 'even' or 'odd'">
+                       <td tal:content="user/getUserName">Login Name</td>
+                       <td tal:content="user/getId">User ID</td>
+                       <td>
+                            <p tal:repeat="role user/getRoles"><span tal:replace="role" /></p>
+                       </td>
+                       <td tal:content="user/getCreationTime">Creation Time</td>
+                       <td tal:content="user/cache_type">anonymous</td>                       
+                   </tr>
+                   </tal:users>
+                   </tbody>
+                   
+                 </table>
+                 
+              </form>
+          </dd>
+          <script type="text/javascript" 
+                   tal:define="extra_script view/extra_script | nothing" 
+                   tal:condition="extra_script" 
+                   tal:content="structure extra_script"> 
+          </script>
+        </dl>
+   </div>
+   </metal:form>
+</metal:main>
+</body>
+</html>
+

@@ -1,0 +1,118 @@
+Changelog
+=========
+
+1.2.6 (Unreleased)
+------------------
+
+- Add Plone 4.1 compatibility when importing IVocabularyFactory.
+  [fvandijk]
+
+- Include Products.CMFCore for Plone 4.1 compatibility.
+  [WouterVH]
+
+
+1.2.5 (2011-05-02)
+------------------
+
+- Added import-support for activated interfaces, user_default_roles
+  and password_encryption [awello]
+
+- Update imports for zope.formlib bump in Plone 4.1
+  [eleddy]
+
+- Update GS import to support plugin id, and update parameter
+  [eleddy]
+
+- Update GS import to read interfaces config for AD plugins,
+  apply cache parameter
+  [eleddy]
+
+
+1.2.4 (2010-12-07)
+------------------
+
+- Fix bug where generic setup exports were exporting boolean values
+  as type int.
+  [kteague]
+
+- Fix bug where generic setup imports weren't choosing names correctly.
+  [kteague]
+
+
+1.2.3 (2010-10-07)
+------------------
+
+- Fix: Login Name, User ID  and RDN attributes were not set correctly on creation.
+  [elro]
+
+
+1.2.2 (2010-08-18)
+------------------
+
+- LDAPProperty fields can now be marked as a Binary property.
+  [kteague]
+
+- Ability to import/export an LDAP configuration using generic setup.
+  This feature is the same as the one provided by collective.genericsetup.ldap
+  and exports made with that product can be imported into plone.app.ldap.
+  During import all existing servers, general settings and schema
+  will be overwritten from config file - but no interfaces or cache
+  settings are changed.
+  [kteague]
+
+- Removed locales directory. You can translate this package
+  in the plone.app.locales package now.
+  [vincentfretin]
+
+- Cleaned templates to work with cmf.pt
+  [pilz]
+
+
+1.2.1 (2010-04-19)
+------------------
+
+- Fallback to Plone 3 compatible imports. Fix display of cache tab in Plone 3.
+  [kteague]
+
+
+1.2 (2010-03-25)
+----------------
+
+- Added a tab for display and modifying the cache settings.
+  [kteague]
+
+- Send out notification events for all object additions/modifications/removals
+  so that configuration always gets propogated to the LDAPUserFolder object.
+  [kteague]
+
+- Changed the base class for LDAPConfiguration so that it gets properly
+  rooted in the site (otherwise LDAPConfiguration.__parent__ goes into
+  an infinite loop, pointing to a fresh PersistenComponents instance who's
+  parent is in turn LDAPConfiguration).
+  [kteague]
+
+- Updated the HTML to wrap all control panel forms in a form tag so that
+  tabs are properly displayed in Plone 4.
+  [kteague]
+
+- Fixed i18n domain changes from Vincent. The message factory was defined in
+  the wrong ``__init__.py``.
+  [hannosch]
+
+- Changed i18n domain from plone to plone.app.ldap.
+  Registered locales directory.
+  [vincentfretin]
+
+
+1.1 (2008-08-16)
+----------------
+
+- Fix ldap schema config for Active Directory
+  [elro]
+
+
+simplon.plone.ldap - 1.0
+------------------------
+
+- Initial package structure.
+  [zopeskel]

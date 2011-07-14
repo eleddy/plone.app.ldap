@@ -1,0 +1,40 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    i18n_domain="plone.app.ldap">
+
+  <!-- We need to register this as a package so CMFQuickInstaller can
+       pick us up.
+    -->
+  <five:registerPackage package="."/>
+
+  <include package="Products.CMFCore" file="permissions.zcml" />
+  <include package=".browser" />
+  <include package=".engine" />
+  <include package=".ploneldap" />
+
+  <genericsetup:registerProfile
+      name="ldap"
+      title="LDAP support"
+      directory="profiles/default"
+      description="Manage LDAP and Active Directory support for Plone."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      />
+
+  <genericsetup:importStep name="ldap-settings-import"
+      title="LDAP Settings Import"
+      description="Import custom LDAP and AD settings."
+      handler=".ploneldap.exportimport.importLDAPSettings"
+      />
+
+  <genericsetup:exportStep name="ldap-settings-export"
+      title="LDAP Settings Export"
+      description="Export custom LDAP and AD settings."
+      handler=".ploneldap.exportimport.exportLDAPSettings"
+      />
+
+</configure>

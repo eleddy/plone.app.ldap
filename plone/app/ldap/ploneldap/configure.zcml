@@ -1,0 +1,9 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope">
+  
+  <utility
+      provides="plone.app.ldap.engine.interfaces.ILDAPConfiguration"
+      factory="plone.app.ldap.engine.storage.LDAPConfiguration" />
+      
+</configure>
+
