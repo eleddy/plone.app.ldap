@@ -10,7 +10,8 @@ from ldap import SCOPE_SUBTREE
 from plone.app.ldap.engine.schema import LDAPProperty
 from plone.app.ldap.ploneldap.util import lookupLDAPPlugin
 
-# TODO: rename this to something more meaningful
+# TODO: rename this to something more meaningful like
+# e.g. LDAPConfigurationProxy
 
 class LDAPConfiguration(object):
     implements(ILDAPConfiguration)
@@ -20,23 +21,24 @@ class LDAPConfiguration(object):
     login_attribute = "uid"
     user_object_classes = "pilotPerson"
     
-    bind_password = ""
-    user_base = ""
-    user_scope = SCOPE_SUBTREE
-    group_base = ""
-    group_scope = SCOPE_SUBTREE
-    password_encryption = ""
-    default_user_roles = ""
-    activated_interfaces = []
-    activated_plugins = None
-    cache = ''
     servers = {}
     
     _ldap_type = u"LDAP"
     _bind_dn = ""
     _rdn_attribute = "uid"
-    _luf = None
+    _bind_password = ""
+    _user_base = ""
+    _user_scope = SCOPE_SUBTREE
+    _group_base = ""
+    _group_scope = SCOPE_SUBTREE
+    _password_encryption = ""
+    _default_user_roles = ""
+    _activated_interfaces = []    
+    _activated_plugins = None
+    _cache = ''
 
+    
+    _luf = None
 
     """
     For the setters, we go through manage because it clears
@@ -44,26 +46,116 @@ class LDAPConfiguration(object):
     Make sure the setter always updates the local config as 
     well so we don't have to check for luf each time.
     
+    XXX:This may duplicate a lot of work actually - maybe flushing 
+    the cache on form submit is better?
+    
     To display forms, having a pas plugin is not required. To
     edit them, however, it is. Currently this is assumed to be 
     done in controlpanel.py before these setters are hit. 
+    
+    XXX: need to get the values from the back end if they exist 
+    but there is the issue
     """ 
+    
+    def getCache(self):
+        return self._cache
+    
+    def setCache(self, value):
+        self._cache = value
+    
+    cache = property(getCache, setCache)
+        
+    def getActivated_plugins(self):
+        return self._activated_plugins
+    
+    def setActivated_plugins(self, value):
+        self._activated_plugins = value
+    
+    activated_plugins = property(getActivated_plugins, setActivated_plugins)
+    
+    def getActivated_interfaces(self):
+        return self._activated_interfaces
+    
+    def setActivated_interfaces(self, value):
+        self._activated_interfaces = value
+    
+    activated_interfaces = property(getActivated_interfaces, setActivated_interfaces)
+    
+    
+    def getDefault_user_roles(self):
+        return self._default_user_roles
+    
+    def setDefault_user_roles(self, value):
+        self._default_user_roles = value
+    
+    default_user_roles = property(getDefault_user_roles, setDefault_user_roles)
+    
+    def getPassword_encryption(self):
+        return self._password_encryption
+    
+    def setPassword_encryption(self, value):
+        self._password_encryption = value
+    
+    password_encryption = property(getPassword_encryption, setPassword_encryption)
+    
+    
+    def getGroup_scope(self):
+        return self._group_scope
+    
+    def setGroup_scope(self, value):
+        self._group_scope = value
+    
+    group_scope = property(getGroup_scope, setGroup_scope)
+    
+    
+    def getGroup_base(self):
+        return self._group_base
+    
+    def setGroup_base(self, value):
+        self._group_base = value
+    
+    group_base = property(getGroup_base, setGroup_base)
+    
+    def getUser_scope(self):
+        return self._user_scope
+    
+    def setUser_scope(self, value):
+        self._user_scope = value
+    
+    user_scope = property(getUser_scope, setUser_scope)
+    
+    def getUser_base(self):
+        return self._user_base
+        
+    def setUser_base(self, value):
+        self._user_base = value
+    
+    user_base = property(getUser_base, setUser_base)
+    
+    def getBind_password(self):
+        return self._bind_password
+        
+    def setBind_password(self, value):
+        self._bind_password = value
+    
+    bind_password = property(getBind_password, setBind_password)
+   
     def getRdn_attribute(self):
         return self._rdn_attribute
         
     def setRdn_attribute(self, value):
         self._rdn_attribute = value
-        # XXX; This made things pretty angry!
+        # XXX: This made things pretty angry!
         #if self.luf:
         #    self.luf.manage_changeProperty('_rdnattr', value)
-    
+        
+    rdn_attribute = property(getRdn_attribute, setRdn_attribute)
     
     def getLdap_type(self):
         return self._ldap_type
     
     def setLdap_type(self, value):
-        # TODO: if we update the type, need to recreate 
-        # the plugin
+        # TODO: if we update the type, need to recreate the plugin
         self._ldap_type = value
         
     ldap_type = property(getLdap_type, setLdap_type)
