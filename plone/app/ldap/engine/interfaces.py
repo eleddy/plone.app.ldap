@@ -12,6 +12,7 @@ from zope.app.container.interfaces import IContained
 from zope.app.container.interfaces import IOrderedContainer
 from zope.app.container.interfaces import IContainerNamesContainer
 from zope.app.container.constraints import contains
+from constraints import isValidDn
 
 from plone.app.ldap import LDAPMessageFactory as _
 
@@ -87,7 +88,8 @@ class ILDAPBinding(Interface):
                         u"information as well as be able to update and create "
                         u"users and groups. Please note that Plone only "
                         u"supports simple binds. SASL is not supported."),
-            required=False)
+            constraint=isValidDn,
+            required=False,)
 
     bind_password = Password(
             title=_(u"label_ldap_bind_password",
@@ -102,6 +104,7 @@ class ILDAPBinding(Interface):
             description=_(u"help_ldap_user_base",
                 default=u"This is the location in your LDAP directory where "
                         u"all users are stored."),
+            constraint=isValidDn,
             required=True)
 
     user_scope = Choice(
@@ -129,6 +132,7 @@ class ILDAPBinding(Interface):
                         u"groupOfUniqueNames object class can be used with "
                         u"uniqueMember property. In Active Directory systems "
                         u"only the group object class is supported."),
+            constraint=isValidDn,
             required=True)
 
     group_scope = Choice(

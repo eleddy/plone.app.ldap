@@ -10,6 +10,7 @@ from ldap import SCOPE_SUBTREE
 from plone.app.ldap.engine.schema import LDAPProperty
 from plone.app.ldap.ploneldap.util import lookupLDAPPlugin
 
+
 # TODO: rename this to something more meaningful like
 # e.g. LDAPConfigurationProxy
 
@@ -164,10 +165,16 @@ class LDAPConfiguration(object):
         return self._bind_dn
     
     def setBind_dn(self, value):
+        '''
+        Setting a dn with bad values causes major borkage from the 
+        top down. We can use this proxy config to make sure the end 
+        user doesn't hate themselves for a silly typo.
+        '''
         self._bind_dn = value
+                    
         if self.luf:
             self.luf.manage_changeProperty('_binduid', value)
-        
+
     bind_dn = property(getBind_dn, setBind_dn)
     
     @property
